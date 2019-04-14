@@ -12,12 +12,13 @@ class PaintingModule extends DrawingFrame {
     }
 
     private void generateFigure() {
-        while (true) {
+        for(int i = 0; i < 100; ++i) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ignored) {
             }
             figures.add(new Figure());
+            System.out.println(i);
         }
     }
 
