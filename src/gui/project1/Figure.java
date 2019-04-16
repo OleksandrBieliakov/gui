@@ -46,4 +46,14 @@ class Figure {
         return positionY;
     }
 
+    @Override
+    public String toString() {
+        return type.toString() + "\n" +
+                color.getRed() + "\n" +
+                color.getGreen() + "\n" +
+                color.getBlue() + "\n" +
+                size + "\n" +
+                positionX + "\n" +
+                positionY + "\n";
+    }
 }

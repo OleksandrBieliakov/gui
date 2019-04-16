@@ -8,11 +8,12 @@ public class DrawingPanel extends JPanel {
 
     private DrawingFrame drawingFrame;
     private ArrayList<Figure> figures = new ArrayList<>();
-    private int figuresNeeded = 3;
+    private int figuresNeeded;
     private int figuresNumber = 0;
 
-    DrawingPanel(DrawingFrame drawingFrame) {
+    DrawingPanel(DrawingFrame drawingFrame, int figuresNeeded) {
         this.drawingFrame = drawingFrame;
+        this.figuresNeeded = figuresNeeded;
         setupPanel();
     }
 
@@ -25,7 +26,9 @@ public class DrawingPanel extends JPanel {
             Thread.sleep(1000);
         } catch (InterruptedException ignored) {
         }
-        figures.add(new Figure());
+        Figure figure = new Figure();
+        figures.add(figure);
+        drawingFrame.saveFigure(figure);
         figuresNumber++;
         repaint();
     }
