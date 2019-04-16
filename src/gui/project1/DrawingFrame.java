@@ -5,9 +5,8 @@ import java.util.ArrayList;
 
 class DrawingFrame extends JFrame {
 
-    private ArrayList<Figure> figures = new ArrayList<>();
-
     DrawingFrame() {
+        add(new DrawingPanel(this));
         setupFrame();
     }
 
@@ -17,10 +16,6 @@ class DrawingFrame extends JFrame {
         this.setSize(1000, 1000);
         this.setVisible(true);
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-    }
-
-    ArrayList<Figure> getFigures() {
-        return figures;
     }
 
 }

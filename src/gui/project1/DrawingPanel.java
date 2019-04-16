@@ -2,10 +2,14 @@ package gui.project1;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 public class DrawingPanel extends JPanel {
 
     private DrawingFrame drawingFrame;
+    private ArrayList<Figure> figures = new ArrayList<>();
+    private int figuresNeeded = 3;
+    private int figuresNumber = 0;
 
     DrawingPanel(DrawingFrame drawingFrame) {
         this.drawingFrame = drawingFrame;
@@ -14,6 +18,16 @@ public class DrawingPanel extends JPanel {
 
     private void setupPanel() {
         this.setBackground(Color.DARK_GRAY);
+    }
+
+    private void generateFigure() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ignored) {
+        }
+        figures.add(new Figure());
+        figuresNumber++;
+        repaint();
     }
 
     @Override
@@ -26,7 +40,7 @@ public class DrawingPanel extends JPanel {
         double size;
         int x, y, width, height, x2, y2;
 
-        for (Figure figure : drawingFrame.getFigures()) {
+        for (Figure figure : figures) {
             mainGraphics.setStroke(new BasicStroke(5));
             mainGraphics.setColor(figure.getColor());
             size = figure.getSize();
@@ -37,11 +51,11 @@ public class DrawingPanel extends JPanel {
 
             switch (figure.getType()) {
                 case RECTANGLE:
-                    mainGraphics.setStroke(new BasicStroke(15));
+                    mainGraphics.setStroke(new BasicStroke(16));
                     mainGraphics.drawRect(x, y, width, height);
                     break;
                 case ELLIPSE:
-                    mainGraphics.setStroke(new BasicStroke(15));
+                    mainGraphics.setStroke(new BasicStroke(16));
                     mainGraphics.drawOval(x, y, width, height);
                     break;
                 case TRIANGLE_TOP:
@@ -69,23 +83,6 @@ public class DrawingPanel extends JPanel {
                     mainGraphics.drawLine(x2, y2, x2 = x + width / 2, y2 = y + height);
                     mainGraphics.drawLine(x2, y2, x, y2 = y + height / 2);
                     mainGraphics.drawLine(x, y2, x + width / 2, y);
-                    break;
-                case DEATHLY_HALLOWS:
-                    // TRIANGLE_TOP
-                    mainGraphics.drawLine(x + width / 2, y, x2 = x + width, y2 = y + height);
-                    mainGraphics.drawLine(x2, y2, x, y2);
-                    mainGraphics.drawLine(x, y2, x + width / 2, y);
-
-                    // LINE
-                    mainGraphics.drawLine(x2 = x + width/2, y, x2, y + height);
-
-                    // CIRCLE
-                    int side = (int)(Math.sqrt(height*height + (width/2)*(width/2)));
-                    int diameterY = 2*(int)(side*Math.sqrt(3)/6);
-                    int diameterX = diameterY*width/height;
-                    x = x + width/2 - diameterX/2;
-                    y = y + height - diameterY;
-                    mainGraphics.drawOval(x, y, diameterX, diameterY);
                     break;
                 case STAR:
                     int tmp1, tmp2;
@@ -127,12 +124,9 @@ public class DrawingPanel extends JPanel {
                     mainGraphics.drawLine(x, y2, x + width, y);
             }
         }
-
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ignored) {
+        if (figuresNumber < figuresNeeded) {
+            generateFigure();
         }
-        repaint();
     }
 
 }

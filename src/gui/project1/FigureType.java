@@ -8,6 +8,5 @@ public enum FigureType {
     TRIANGLE_BOTTOM,
     TRIANGLE_LEFT,
     RHOMBUS,
-    STAR,
-    DEATHLY_HALLOWS
+    STAR
 }
