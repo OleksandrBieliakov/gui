@@ -16,7 +16,7 @@ public class DrawingPanel extends JPanel {
         this.setBackground(Color.DARK_GRAY);
     }
 
-    public void addFigureToList(Figure figure) {
+    void addFigureToList(Figure figure) {
         figures.add(figure);
     }
 
