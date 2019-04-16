@@ -8,16 +8,10 @@ import java.io.IOException;
 
 class DrawingFrame extends JFrame {
 
-    //private File file;
-    private BufferedWriter bufferedWriter;
+    private File file;
 
     DrawingFrame(int figuresNeeded, File file) {
-        //this.file = file;
-        try {
-            bufferedWriter = new BufferedWriter(new FileWriter(file));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this.file = file;
         add(new DrawingPanel(this, figuresNeeded));
         setupFrame();
     }
@@ -30,11 +24,12 @@ class DrawingFrame extends JFrame {
     }
 
     void saveFigure(Figure figure) {
-        try {
-            bufferedWriter.write(figure.toString());
+        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file, true))) {
+            bufferedWriter.append(figure.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
 }
