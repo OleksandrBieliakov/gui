@@ -26,6 +26,14 @@ class Figure {
         positionY = Math.random();
     }
 
+    Figure(FigureType type, int red, int green, int blue, double size, double positionX, double positionY) {
+        this.type = type;
+        color = new Color(red, green, blue);
+        this.size = size;
+        this.positionX = positionX;
+        this.positionY = positionY;
+    }
+
     FigureType getType() {
         return type;
     }

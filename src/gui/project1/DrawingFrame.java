@@ -1,10 +1,8 @@
 package gui.project1;
 
 import javax.swing.*;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
 
 class DrawingFrame extends JFrame {
 
@@ -12,7 +10,7 @@ class DrawingFrame extends JFrame {
 
     DrawingFrame(int figuresNeeded, File file) {
         this.file = file;
-        add(new DrawingPanel(this, figuresNeeded));
+        add(new GeneratorPanel(this, figuresNeeded));
         setupFrame();
     }
 
@@ -24,12 +22,41 @@ class DrawingFrame extends JFrame {
     }
 
     void saveFigure(Figure figure) {
-        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file, true))) {
-            bufferedWriter.append(figure.toString());
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, true))) {
+            bw.append(figure.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    ArrayList<Figure> readFile(int skipLines) {
+        ArrayList<Figure> newFigures = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            while (skipLines-- > 0) {
+                br.readLine();
+            }
+            String s;
+            FigureType type;
+            int red;
+            int green;
+            int blue;
+            double size;
+            double positionX;
+            double positionY;
+            while ((s = br.readLine()) != null) {
+                type = FigureType.valueOf(s);
+                red = Integer.parseInt(br.readLine());
+                green = Integer.parseInt(br.readLine());
+                blue = Integer.parseInt(br.readLine());
+                size = Double.parseDouble(br.readLine());
+                positionX = Double.parseDouble(br.readLine());
+                positionY = Double.parseDouble(br.readLine());
+                newFigures.add(new Figure(type, red, green, blue, size, positionX, positionY));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return newFigures;
     }
 
 }

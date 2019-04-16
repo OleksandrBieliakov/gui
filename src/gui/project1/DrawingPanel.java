@@ -6,14 +6,9 @@ import java.util.ArrayList;
 
 public class DrawingPanel extends JPanel {
 
-    private DrawingFrame drawingFrame;
     private ArrayList<Figure> figures = new ArrayList<>();
-    private int figuresNeeded;
-    private int figuresNumber = 0;
 
-    DrawingPanel(DrawingFrame drawingFrame, int figuresNeeded) {
-        this.drawingFrame = drawingFrame;
-        this.figuresNeeded = figuresNeeded;
+    DrawingPanel() {
         setupPanel();
     }
 
@@ -21,16 +16,8 @@ public class DrawingPanel extends JPanel {
         this.setBackground(Color.DARK_GRAY);
     }
 
-    private void generateFigure() {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException ignored) {
-        }
-        Figure figure = new Figure();
+    public void addFigureToList(Figure figure) {
         figures.add(figure);
-        drawingFrame.saveFigure(figure);
-        figuresNumber++;
-        repaint();
     }
 
     @Override
@@ -126,9 +113,6 @@ public class DrawingPanel extends JPanel {
                     mainGraphics.drawLine(x2, y2, x, y2 = y + height / 2);
                     mainGraphics.drawLine(x, y2, x + width, y);
             }
-        }
-        if (figuresNumber < figuresNeeded) {
-            generateFigure();
         }
     }
 
