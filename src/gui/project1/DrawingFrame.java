@@ -6,7 +6,6 @@ import java.util.ArrayList;
 class DrawingFrame extends JFrame {
 
     DrawingFrame() {
-        add(new DrawingPanel(this));
         setupFrame();
     }
 
