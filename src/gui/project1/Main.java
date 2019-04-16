@@ -8,7 +8,7 @@ public class Main {
 
         File file = new File("data/figures");
 
-        new DrawingFrame(5, file);
+        new DrawingFrame(50, file);
 
         new DrawingFrame(file);
 

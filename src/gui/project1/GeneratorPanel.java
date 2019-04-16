@@ -11,6 +11,7 @@ public class GeneratorPanel extends DrawingPanel {
     GeneratorPanel(DrawingFrame drawingFrame, int figuresNeeded) {
         this.drawingFrame = drawingFrame;
         this.figuresNeeded = figuresNeeded;
+        super.checkFile(drawingFrame);
     }
 
     private void generateFigure() {

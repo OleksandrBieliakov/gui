@@ -1,6 +1,7 @@
 package gui.project1;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
 
@@ -11,6 +12,12 @@ class DrawingFrame extends JFrame {
     DrawingFrame(int figuresNeeded, File file) {
         this.file = file;
         add(new GeneratorPanel(this, figuresNeeded));
+
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int width = (int)screenSize.getWidth();
+        this.setLocation(0, 0);
+        this.setSize(width/2, width/2);
+
         this.setTitle("Painting module");
         setupFrame();
     }
@@ -18,12 +25,17 @@ class DrawingFrame extends JFrame {
     DrawingFrame(File file) {
         this.file = file;
         add(new DisplayPanel(this));
+
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int width = (int)screenSize.getWidth();
+        this.setLocation(width/2, 0);
+        this.setSize(width/2, width/2);
+
         this.setTitle("Display module");
         setupFrame();
     }
 
     private void setupFrame() {
-        this.setSize(1000, 1000);
         this.setVisible(true);
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
