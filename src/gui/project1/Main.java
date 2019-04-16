@@ -10,7 +10,7 @@ public class Main {
 
         new DrawingFrame(5, file);
 
-
+        new DrawingFrame(file);
 
     }
 

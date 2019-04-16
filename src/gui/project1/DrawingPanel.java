@@ -20,6 +20,10 @@ public class DrawingPanel extends JPanel {
         figures.add(figure);
     }
 
+    void checkFile(DrawingFrame drawingFrame) {
+        figures.addAll(drawingFrame.readFile(figures.size() * 7));
+    }
+
     @Override
     protected void paintComponent(Graphics currentGraphics) {
         super.paintComponent(currentGraphics);

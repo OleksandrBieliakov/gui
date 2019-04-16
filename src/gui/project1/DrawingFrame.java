@@ -11,11 +11,18 @@ class DrawingFrame extends JFrame {
     DrawingFrame(int figuresNeeded, File file) {
         this.file = file;
         add(new GeneratorPanel(this, figuresNeeded));
+        this.setTitle("Painting module");
+        setupFrame();
+    }
+
+    DrawingFrame(File file) {
+        this.file = file;
+        add(new DisplayPanel(this));
+        this.setTitle("Display module");
         setupFrame();
     }
 
     private void setupFrame() {
-        this.setTitle("Drawing panel");
         this.setSize(1000, 1000);
         this.setVisible(true);
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -32,7 +39,7 @@ class DrawingFrame extends JFrame {
     ArrayList<Figure> readFile(int skipLines) {
         ArrayList<Figure> newFigures = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            while (skipLines-- > 0) {
+            while(skipLines-- > 0) {
                 br.readLine();
             }
             String s;
