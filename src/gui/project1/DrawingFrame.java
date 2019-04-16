@@ -43,8 +43,7 @@ class DrawingFrame extends JFrame {
     void saveFigure(Figure figure) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, true))) {
             bw.append(figure.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ignored) {
         }
     }
 
@@ -72,8 +71,7 @@ class DrawingFrame extends JFrame {
                 positionY = Double.parseDouble(br.readLine());
                 newFigures.add(new Figure(type, red, green, blue, size, positionX, positionY));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ignored) {
         }
         return newFigures;
     }
