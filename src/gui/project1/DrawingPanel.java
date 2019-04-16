@@ -33,23 +33,30 @@ public class DrawingPanel extends JPanel {
         int frameHeight = getHeight();
         double size;
         int x, y, width, height, x2, y2;
+        double stroke;
+
+        if (frameWidth < frameHeight) {
+            stroke = frameWidth * 0.005;
+        } else {
+            stroke = frameHeight * 0.005;
+        }
 
         for (Figure figure : figures) {
-            mainGraphics.setStroke(new BasicStroke(5));
             mainGraphics.setColor(figure.getColor());
             size = figure.getSize();
             width = (int) (frameWidth / 16 + (size * frameWidth / 8));
             height = (int) (frameHeight / 16 + (size * frameHeight / 8));
             x = (int) ((frameWidth - width) * figure.getPositionX());
             y = (int) ((frameHeight - height) * figure.getPositionY());
+            mainGraphics.setStroke(new BasicStroke((int) stroke));
 
             switch (figure.getType()) {
                 case RECTANGLE:
-                    mainGraphics.setStroke(new BasicStroke(16));
+                    mainGraphics.setStroke(new BasicStroke((int) stroke * 3));
                     mainGraphics.drawRect(x, y, width, height);
                     break;
                 case ELLIPSE:
-                    mainGraphics.setStroke(new BasicStroke(16));
+                    mainGraphics.setStroke(new BasicStroke((int) stroke * 3));
                     mainGraphics.drawOval(x, y, width, height);
                     break;
                 case TRIANGLE_TOP:
