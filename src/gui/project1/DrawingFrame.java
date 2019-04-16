@@ -14,9 +14,9 @@ class DrawingFrame extends JFrame {
         add(new GeneratorPanel(this, figuresNeeded));
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int width = (int)screenSize.getWidth();
+        int width = (int) screenSize.getWidth();
         this.setLocation(0, 0);
-        this.setSize(width/2, width/2);
+        this.setSize(width / 2, width / 2);
 
         this.setTitle("Painting module");
         setupFrame();
@@ -27,9 +27,9 @@ class DrawingFrame extends JFrame {
         add(new DisplayPanel(this));
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int width = (int)screenSize.getWidth();
-        this.setLocation(width/2, 0);
-        this.setSize(width/2, width/2);
+        int width = (int) screenSize.getWidth();
+        this.setLocation(width / 2, 0);
+        this.setSize(width / 2, width / 2);
 
         this.setTitle("Display module");
         setupFrame();
@@ -50,7 +50,7 @@ class DrawingFrame extends JFrame {
     ArrayList<Figure> readFile(int skipLines) {
         ArrayList<Figure> newFigures = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            while(skipLines-- > 0) {
+            while (skipLines-- > 0) {
                 br.readLine();
             }
             String s;
