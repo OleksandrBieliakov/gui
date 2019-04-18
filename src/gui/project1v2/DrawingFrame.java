@@ -10,18 +10,41 @@ class DrawingFrame extends JFrame {
     private int figuresInList;
     private DrawingPanel panel;
 
-    DrawingFrame(File file, boolean type) { // type: true - painting module, false - display module
+    DrawingFrame(File file, String title, FramePositioning positioning) {
         this.file = file;
         panel = new DrawingPanel();
-        int width = (int) (Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 2);
-        this.setSize(width, width);
-        if (type) {
-            this.setLocation(0, 0);
-            this.setTitle("Painting module");
-        } else {
-            this.setLocation(width, 0);
-            this.setTitle("Display module");
+        this.setTitle(title);
+
+        int width = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+        int height = (int) (Toolkit.getDefaultToolkit().getScreenSize().getHeight() * 0.95);
+
+        switch (positioning) {
+            case ONE_CENTER:
+                this.setSize(height, height);
+                this.setLocationRelativeTo(null);
+                break;
+            case TWO_LEFT:
+                this.setSize(width / 2, height);
+                this.setLocation(0, 0);
+                break;
+            case TWO_RIGHT:
+                this.setSize(width / 2, height);
+                this.setLocation(width / 2, 0);
+                break;
+            case THREE_LEFT:
+                this.setSize(width / 3, height);
+                this.setLocation(0, 0);
+                break;
+            case THREE_CENTER:
+                this.setSize(width / 3, height);
+                this.setLocation(width / 3, 0);
+                break;
+            case THREE_RIGHT:
+                this.setSize(width / 3, height);
+                this.setLocation(width / 3 * 2, 0);
+                break;
         }
+
         this.setVisible(true);
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         readFile();
