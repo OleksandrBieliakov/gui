@@ -12,7 +12,7 @@ class DrawingFrame extends JFrame {
 
     DrawingFrame(File file, boolean type) { // type: true - painting module, false - display module
         this.file = file;
-        add(panel = new DrawingPanel());
+        panel = new DrawingPanel();
         int width = (int) (Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 2);
         this.setSize(width, width);
         if (type) {
@@ -25,6 +25,7 @@ class DrawingFrame extends JFrame {
         this.setVisible(true);
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         readFile();
+        add(panel);
     }
 
     void refresh() {
@@ -71,8 +72,7 @@ class DrawingFrame extends JFrame {
                 panel.addFigureToList(new Figure(type, red, green, blue, size, positionX, positionY));
                 figuresInList++;
             }
-        } catch (FileNotFoundException e) {
-            System.out.println("New file \"figures\" created by " + this.getTitle());
+        } catch (FileNotFoundException ignored) {
         } catch (IOException e) {
             e.printStackTrace();
         }

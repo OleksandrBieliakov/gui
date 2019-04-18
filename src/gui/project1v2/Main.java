@@ -12,6 +12,21 @@ public class Main {
         return Integer.parseInt(s);
     }
 
+    private static void runPantingModule(File file, int figuresNeed) {
+        DrawingFrame paintingModule = new DrawingFrame(file, true);
+        int figuresGenerated = 0;
+        while (figuresGenerated < figuresNeed) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            paintingModule.generateFigure();
+            figuresGenerated++;
+            paintingModule.refresh();
+        }
+    }
+
     private static void runBothModules(File file, int figuresNeeded) {
         DrawingFrame paintingModule = new DrawingFrame(file, true);
         DrawingFrame displayModule = new DrawingFrame(file, false);
@@ -46,7 +61,9 @@ public class Main {
 
     public static void main(String[] args) {
 
-        int figuresNeeded = askNumber();
+        Object[] options = {"Painting", "Display", "Both", "Cancel"};
+        int selected = JOptionPane.showOptionDialog(null, "Which module do you want to open?", "Module select", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[3]);
+        if (selected == 3) System.exit(0);
 
         File dir = new File("data");
         if (!dir.isDirectory()) {
@@ -58,7 +75,10 @@ public class Main {
         }
         File file = new File(dir, "figures");
 
-        runBothModules(file, figuresNeeded);
+        if (selected == 0) runPantingModule(file, askNumber());
+        else if (selected == 1) new DrawingFrame(file, false);
+        else runBothModules(file, askNumber());
+
     }
 
 }
