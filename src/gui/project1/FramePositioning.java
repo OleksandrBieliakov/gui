@@ -1,4 +1,4 @@
-package gui.project1v2;
+package gui.project1;
 
 public enum FramePositioning {
     ONE_CENTER,

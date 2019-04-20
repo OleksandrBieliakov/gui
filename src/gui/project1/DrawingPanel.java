@@ -9,19 +9,11 @@ public class DrawingPanel extends JPanel {
     private ArrayList<Figure> figures = new ArrayList<>();
 
     DrawingPanel() {
-        setupPanel();
-    }
-
-    private void setupPanel() {
         this.setBackground(Color.DARK_GRAY);
     }
 
     void addFigureToList(Figure figure) {
         figures.add(figure);
-    }
-
-    void checkFile(DrawingFrame drawingFrame) {
-        figures.addAll(drawingFrame.readFile(figures.size() * 7));
     }
 
     @Override

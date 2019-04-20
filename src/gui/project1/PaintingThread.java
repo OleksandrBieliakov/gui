@@ -1,4 +1,4 @@
-package gui.project1v2;
+package gui.project1;
 
 import javax.swing.*;
 import java.util.concurrent.atomic.AtomicInteger;
