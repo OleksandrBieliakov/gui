@@ -2,7 +2,6 @@ package gui.project1v2;
 
 import javax.swing.*;
 import java.io.File;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main {
@@ -13,18 +12,27 @@ public class Main {
         return Integer.parseInt(s);
     }
 
-    private static void runPantingModule(File file, int figuresNeed) {
+    private static void runPantingModule(File file, int figuresNeeded) {
         DrawingFrame paintingModule = new DrawingFrame(file, "Painting module", FramePositioning.valueOf("ONE_CENTER"));
-        int figuresGenerated = 0;
-        while (figuresGenerated < figuresNeed) {
+        AtomicInteger figuresGenerated = new AtomicInteger();
+        int rate = 1000;
+
+        try {
+            Thread.sleep(rate);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        while (figuresGenerated.get() < figuresNeeded) {
+            SwingUtilities.invokeLater(() -> {
+                paintingModule.generateFigure();
+                figuresGenerated.getAndIncrement();
+            });
+            SwingUtilities.invokeLater(paintingModule::refresh);
             try {
-                Thread.sleep(1000);
+                Thread.sleep(rate);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            paintingModule.generateFigure();
-            paintingModule.refresh();
-            figuresGenerated++;
         }
     }
 
@@ -32,20 +40,9 @@ public class Main {
         DrawingFrame paintingModule = new DrawingFrame(file, "Painting module", FramePositioning.valueOf("TWO_LEFT"));
         DrawingFrame displayModule = new DrawingFrame(file, "Display module", FramePositioning.valueOf("TWO_RIGHT"));
 
-        int figuresGenerated = 0;
+        AtomicInteger figuresGenerated = new AtomicInteger(0);
 
-        while (figuresGenerated < figuresNeeded) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            paintingModule.generateFigure();
-            paintingModule.refresh();
-            displayModule.readFile();
-            displayModule.refresh();
-            figuresGenerated++;
-        }
+        new PaintingThread(paintingModule, displayModule, figuresNeeded, figuresGenerated, 1000).start();
     }
 
     private static void runMerge(File file, int figuresNeeded) {
@@ -54,34 +51,14 @@ public class Main {
         DrawingFrame paintingModule2 = new DrawingFrame(file, "Painting module 2", FramePositioning.valueOf("THREE_RIGHT"));
 
         AtomicInteger figuresGenerated = new AtomicInteger(0);
-        AtomicBoolean canUseFile = new AtomicBoolean(true);
 
-        new PaintingThread(paintingModule1, figuresNeeded, figuresGenerated, canUseFile).start();
-        new PaintingThread(paintingModule2, figuresNeeded, figuresGenerated, canUseFile).start();
-        new Thread(() -> {
-            int lastFiguresGenerated = 0;
-            while (figuresGenerated.get() < figuresNeeded) {
-                if (lastFiguresGenerated < figuresGenerated.get() && canUseFile.get()) {
-                    canUseFile.set(false);
-                    displayModule.readFile();
-                    displayModule.refresh();
-                    lastFiguresGenerated = figuresGenerated.get();
-                    canUseFile.set(true);
-                }
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            displayModule.readFile();
-            displayModule.refresh();
-        }).start();
+        new PaintingThread(paintingModule1, displayModule, figuresNeeded, figuresGenerated, 1000).start();
+        new PaintingThread(paintingModule2, displayModule, figuresNeeded, figuresGenerated, 1000).start();
     }
 
     public static void main(String[] args) {
 
-        Object[] options = {"Painting", "Display", "Both", "SOMETHING COOL:)", "Cancel"};
+        Object[] options = {"Painting", "Display", "Both", "MERGE", "Cancel"};
         int selected = JOptionPane.showOptionDialog(null, "Which module do you want to open?", "Module select", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[3]);
         if (selected == 4) System.exit(0);
 

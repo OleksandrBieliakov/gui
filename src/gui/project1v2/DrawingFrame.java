@@ -47,7 +47,13 @@ class DrawingFrame extends JFrame {
 
         this.setVisible(true);
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        readFile();
+        try {
+            Thread initialFileRead = new Thread(this::readFile);
+            initialFileRead.join();
+            initialFileRead.start();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         add(panel);
     }
 

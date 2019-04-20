@@ -1,51 +1,45 @@
 package gui.project1v2;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import javax.swing.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class PaintingThread extends Thread {
     private final DrawingFrame paintingModule;
+    private final DrawingFrame displayModule;
     private final int figuresNeeded;
     private AtomicInteger figuresGenerated;
-    private AtomicBoolean canUseFile;
+    private final int rate;
 
-    PaintingThread(DrawingFrame paintingModule, int figuresNeeded, AtomicInteger figuresGenerated, AtomicBoolean canUseFile) {
+    PaintingThread(DrawingFrame paintingModule, DrawingFrame displayModule, int figuresNeeded, AtomicInteger figuresGenerated, int rate) {
         this.paintingModule = paintingModule;
+        this.displayModule = displayModule;
         this.figuresNeeded = figuresNeeded;
         this.figuresGenerated = figuresGenerated;
-        this.canUseFile = canUseFile;
+        this.rate = rate;
     }
 
     @Override
     public void run() {
         try {
-            Thread.sleep(1000);
+            Thread.sleep(rate);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        int sleepTime = 0;
         while (figuresGenerated.get() < figuresNeeded) {
-            while (!canUseFile.get()) {
-                try {
-                    Thread.sleep(5);
-                    sleepTime += 5;
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+            SwingUtilities.invokeLater(() -> {
+                if (figuresGenerated.get() < figuresNeeded) {
+                    paintingModule.generateFigure();
+                    figuresGenerated.getAndIncrement();
                 }
-            }
-            if (figuresGenerated.get() < figuresNeeded) {
-                canUseFile.set(false);
-                paintingModule.generateFigure();
-                figuresGenerated.getAndIncrement();
-                paintingModule.refresh();
-                canUseFile.set(true);
-            }
+            });
+            SwingUtilities.invokeLater(paintingModule::refresh);
+            SwingUtilities.invokeLater(displayModule::readFile);
+            SwingUtilities.invokeLater(displayModule::refresh);
             try {
-                Thread.sleep(1000 - sleepTime);
+                Thread.sleep(rate);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            sleepTime = 0;
         }
     }
 }
