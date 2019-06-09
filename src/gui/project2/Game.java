@@ -17,6 +17,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Game extends Application {
 
@@ -36,29 +37,29 @@ public class Game extends Application {
 
         int n = 3;
         int m = 4;
-        int size = m*n;
+        int size = m * n;
         double width = image.getWidth();
         double height = image.getHeight();
-        int partW = (int)width/m;
-        int partH = (int)height/n;
+        int partW = (int) width / m;
+        int partH = (int) height / n;
 
         PixelReader reader = image.getPixelReader();
 
         ArrayList<ImageView> parts = new ArrayList<>();
 
-        for(int i = 0; i < n; i++) {
-            for(int j = 0; j < m; j++) {
-                parts.add(new ImageView(new WritableImage(reader, j*partW, i*partH, partW, partH)));
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                parts.add(new ImageView(new WritableImage(reader, j * partW, i * partH, partW, partH)));
             }
         }
 
         ArrayList<ImageView> partsMix = new ArrayList<>(parts);
 
         Random r = new Random();
-        for(int i = 10, a, b; i > 0; --i) {
+        for (int i = 10, a, b; i > 0; --i) {
             a = r.nextInt(size);
             b = r.nextInt(size);
-            while(b == a) {
+            while (b == a) {
                 b = r.nextInt(size);
             }
             Collections.swap(partsMix, a, b);
@@ -70,25 +71,37 @@ public class Game extends Application {
 
         root.add(exit, 0, 0);
 
-        for(int i = 0; i < m; i++) {
-            for(int j = 0; j < n; j++) {
-                root.add(partsMix.get(j*m+i), i, j + 1, 1, 1);
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                root.add(partsMix.get(j * m + i), i, j + 1, 1, 1);
             }
         }
 
-        int missing = r.nextInt(size);
+        AtomicInteger missingN = new AtomicInteger(r.nextInt(n) + 1);
+        AtomicInteger missingM = new AtomicInteger(r.nextInt(m));
+        int missing = m * (missingN.get() - 1) + missingM.get();
         root.getChildren().remove(partsMix.get(missing));
 
         EventHandler<MouseEvent> handler = e -> {
-            int li = partsMix.lastIndexOf(e.getSource());
-            System.out.println("m " + missing + " li " + li);
-            //Collections.swap(partsMix, missing, li);   ????????????????
+            ImageView tmp = (ImageView) e.getSource();
+            int tmpM = GridPane.getColumnIndex(tmp);
+            int tmpN = GridPane.getRowIndex(tmp);
+
+            if ((tmpM == missingM.get() && tmpN == missingN.get() + 1) ||
+                    (tmpM == missingM.get() && tmpN == missingN.get() - 1) ||
+                    (tmpM == missingM.get() + 1 && tmpN == missingN.get()) ||
+                    (tmpM == missingM.get() - 1 && tmpN == missingN.get())) {
+                root.getChildren().remove(tmp);
+                root.add(tmp, missingM.get(), missingN.get(), 1, 1);
+                missingM.set(tmpM);
+                missingN.set(tmpN);
+            }
         };
 
 
-        for(int i = 0; i < size; ++i) {
-            if(i != missing)
-            partsMix.get(i).addEventHandler(MouseEvent.MOUSE_CLICKED, handler);
+        for (int i = 0; i < size; ++i) {
+            if (i != missing)
+                partsMix.get(i).addEventHandler(MouseEvent.MOUSE_CLICKED, handler);
         }
 
         root.setGridLinesVisible(true);
