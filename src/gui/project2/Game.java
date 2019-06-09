@@ -1,18 +1,22 @@
 package gui.project2;
 
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
 
 public class Game extends Application {
 
@@ -32,6 +36,7 @@ public class Game extends Application {
 
         int n = 3;
         int m = 4;
+        int size = m*n;
         double width = image.getWidth();
         double height = image.getHeight();
         int partW = (int)width/m;
@@ -47,12 +52,19 @@ public class Game extends Application {
             }
         }
 
-        //imageView.setFitHeight(768);
-        //imageView.setFitWidth(1024);
-        //imageView.setPreserveRatio(false);
+        ArrayList<ImageView> partsMix = new ArrayList<>(parts);
+
+        Random r = new Random();
+        for(int i = 10, a, b; i > 0; --i) {
+            a = r.nextInt(size);
+            b = r.nextInt(size);
+            while(b == a) {
+                b = r.nextInt(size);
+            }
+            Collections.swap(partsMix, a, b);
+        }
 
         Button exit = new Button("Exit");
-
 
         GridPane root = new GridPane();
 
@@ -60,8 +72,23 @@ public class Game extends Application {
 
         for(int i = 0; i < m; i++) {
             for(int j = 0; j < n; j++) {
-                root.add(parts.get(j*m+i), i, j + 1, 1, 1);
+                root.add(partsMix.get(j*m+i), i, j + 1, 1, 1);
             }
+        }
+
+        int missing = r.nextInt(size);
+        root.getChildren().remove(partsMix.get(missing));
+
+        EventHandler<MouseEvent> handler = e -> {
+            int li = partsMix.lastIndexOf(e.getSource());
+            System.out.println("m " + missing + " li " + li);
+            //Collections.swap(partsMix, missing, li);   ????????????????
+        };
+
+
+        for(int i = 0; i < size; ++i) {
+            if(i != missing)
+            partsMix.get(i).addEventHandler(MouseEvent.MOUSE_CLICKED, handler);
         }
 
         root.setGridLinesVisible(true);
