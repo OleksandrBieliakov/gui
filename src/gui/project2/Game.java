@@ -35,8 +35,8 @@ public class Game extends Application {
             e.printStackTrace();
         }
 
-        int n = 3;
-        int m = 4;
+        int n = 2;
+        int m = 3;
         int size = m * n;
         double width = image.getWidth();
         double height = image.getHeight();
@@ -56,7 +56,7 @@ public class Game extends Application {
         ArrayList<ImageView> partsMix = new ArrayList<>(parts);
 
         Random r = new Random();
-        for (int i = 10, a, b; i > 0; --i) {
+        for (int i = 1, a, b; i > 0; --i) {
             a = r.nextInt(size);
             b = r.nextInt(size);
             while (b == a) {
@@ -79,8 +79,8 @@ public class Game extends Application {
 
         AtomicInteger missingN = new AtomicInteger(r.nextInt(n) + 1);
         AtomicInteger missingM = new AtomicInteger(r.nextInt(m));
-        int missing = m * (missingN.get() - 1) + missingM.get();
-        root.getChildren().remove(partsMix.get(missing));
+        AtomicInteger missing = new AtomicInteger(m * (missingN.get() - 1) + missingM.get());
+        root.getChildren().remove(partsMix.get(missing.get()));
 
         EventHandler<MouseEvent> handler = e -> {
             ImageView tmp = (ImageView) e.getSource();
@@ -91,16 +91,22 @@ public class Game extends Application {
                     (tmpM == missingM.get() && tmpN == missingN.get() - 1) ||
                     (tmpM == missingM.get() + 1 && tmpN == missingN.get()) ||
                     (tmpM == missingM.get() - 1 && tmpN == missingN.get())) {
+                int tmpI = (tmpN - 1)* m + tmpM;
+                Collections.swap(partsMix, missing.get(), tmpI);
+                missing.set(tmpI);
                 root.getChildren().remove(tmp);
                 root.add(tmp, missingM.get(), missingN.get(), 1, 1);
                 missingM.set(tmpM);
                 missingN.set(tmpN);
+                if(partsMix.equals(parts)) {
+                    System.out.println("YOU WON!");
+                }
             }
         };
 
 
         for (int i = 0; i < size; ++i) {
-            if (i != missing)
+            if (i != missing.get())
                 partsMix.get(i).addEventHandler(MouseEvent.MOUSE_CLICKED, handler);
         }
 
