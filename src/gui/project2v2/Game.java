@@ -6,6 +6,7 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -16,6 +17,8 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -53,7 +56,12 @@ public class Game extends Application {
         Button btnEX = new Button("EXIT");
         btnEX.setOnAction(e -> System.exit(0));
 
-        VBox root1 = new VBox();
+        btnPL.setFont(Font.font("System", FontWeight.BOLD, 50));
+        btnBT.setFont(Font.font("System", FontWeight.BOLD, 50));
+        btnEX.setFont(Font.font("System", FontWeight.BOLD, 50));
+
+        VBox root1 = new VBox(20);
+        root1.setAlignment(Pos.CENTER);
 
         root1.getChildren().addAll(btnPL, btnBT, btnEX);
 
@@ -62,7 +70,7 @@ public class Game extends Application {
 
     private static Scene setRecordsScene(Stage primaryStage) {
 
-        GridPane root = new GridPane();
+        VBox root1 = new VBox(20);
 
         Button exit = new Button("EXIT TO MENU");
         exit.setOnAction(event -> {
@@ -72,7 +80,12 @@ public class Game extends Application {
                 }
         );
 
-        root.add(exit, 0, 0);
+        exit.setFont(Font.font("System", FontWeight.BOLD, 30));
+
+        root1.setAlignment(Pos.CENTER);
+
+        GridPane grid = new GridPane();
+
         int next = 1;
         File file = new File("data/pr2_board");
         boolean newRec = false;
@@ -83,20 +96,27 @@ public class Game extends Application {
             while ((s = br.readLine()) != null) {
                 name = s;
                 record = Integer.parseInt(br.readLine());
-                root.add(new Label(next + ". " + name), 0, next);
+                Label names = new Label(next + ". " + name);
+                names.setFont(Font.font("System", FontWeight.BOLD, 30));
+                grid.add(names, 0, next);
                 int min = (int) (record) / 60000;
                 int sec = (int) ((record - min * 60000) / 1000);
-                root.add(new Label(min + ":" + sec), 1, next++);
+                Label records = new Label(min + ":" + sec);
+                records.setFont(Font.font("System", FontWeight.BOLD, 30));
+                grid.add(records, 1, next++);
             }
         } catch (FileNotFoundException ignored) {
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return new Scene(root, 1024, 768);
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(20);
+        root1.getChildren().addAll(exit, grid);
+
+        return new Scene(root1, 1024, 768);
     }
 
-    @SuppressWarnings("Duplicates")
     private static Scene setPuzzleScene(Stage primaryStage) {
         Image image = null;
         try {
@@ -105,8 +125,8 @@ public class Game extends Application {
             e.printStackTrace();
         }
 
-        int n = 2;
-        int m = 3;
+        int n = 4;
+        int m = 4;
         int size = m * n;
         double width = image.getWidth();
         double height = image.getHeight();
@@ -127,7 +147,6 @@ public class Game extends Application {
 
         Random r = new Random();
 
-
         AtomicInteger missingN = new AtomicInteger(r.nextInt(n));
         AtomicInteger missingM = new AtomicInteger(r.nextInt(m));
         AtomicInteger missing = new AtomicInteger(m * (missingN.get()) + missingM.get());
@@ -136,24 +155,17 @@ public class Game extends Application {
 
             ArrayList<Integer> arr = new ArrayList<>();
 
-            System.out.println("n " + missingN.get() + " m " + missingM.get() + " mis" + missing.get());
-
-
             if ((missingN.get() + 1) < n) {
                 arr.add(m * (missingN.get() + 1) + missingM.get());
-                System.out.println("1-" + arr.get(arr.size() - 1));
             }
             if ((missingN.get() - 1) >= 0) {
                 arr.add(m * (missingN.get() - 1) + missingM.get());
-                System.out.println("2-" + arr.get(arr.size() - 1));
             }
             if ((missingM.get() + 1) < m) {
                 arr.add(m * missingN.get() + missingM.get() + 1);
-                System.out.println("3-" + arr.get(arr.size() - 1));
             }
             if ((missingM.get() - 1) >= 0) {
                 arr.add(m * missingN.get() + missingM.get() - 1);
-                System.out.println("4-" + arr.get(arr.size() - 1));
             }
 
             int with = r.nextInt(arr.size());
@@ -162,8 +174,6 @@ public class Game extends Application {
             missingN.set(arr.get(with) / m);
             missingM.set(arr.get(with) % m);
             missing.set(arr.get(with));
-
-            System.out.println("n " + missingN.get() + " m " + missingM.get() + " mis " + missing.get());
 
         }
 
@@ -176,6 +186,8 @@ public class Game extends Application {
                     primaryStage.show();
                 }
         );
+
+        exit.setFont(Font.font("System", FontWeight.BOLD, 20));
 
         GridPane root = new GridPane();
 
@@ -191,8 +203,8 @@ public class Game extends Application {
 
         Label timer = new Label("00:00");
         GridPane.setHalignment(timer, HPos.CENTER);
-        root.add(timer, n, 0);
-
+        timer.setFont(Font.font("System", FontWeight.BOLD, 30));
+        root.add(timer, m - 1, 0);
 
         long start = System.currentTimeMillis();
 
@@ -229,13 +241,12 @@ public class Game extends Application {
 
                     Label completed = new Label("COMPLETED!");
                     GridPane.setHalignment(completed, HPos.CENTER);
-                    root.add(completed, n - 1, 0);
+                    root.add(completed, m - 2, 0);
 
                     checkBoard(System.currentTimeMillis() - start);
                 }
             }
         };
-
 
         for (int i = 0; i < size; ++i) {
             if (i != missing.get())
@@ -246,7 +257,6 @@ public class Game extends Application {
 
         return new Scene(root);
     }
-
 
     private static void checkBoard(long time) {
         File file = new File("data/pr2_board");
@@ -272,16 +282,8 @@ public class Game extends Application {
         String name = JOptionPane.showInputDialog("NEW RECORD! Enter your name:");
 
         board.add(new GameRecord(name, (int) time));
-        int count = 1;
-        for (GameRecord gr : board) {
-            System.out.print(count++ + ". " + gr.toString());
-        }
-        System.out.println();
+
         board.sort(Comparator.naturalOrder());
-        count = 1;
-        for (GameRecord gr : board) {
-            System.out.print(count++ + ". " + gr.toString());
-        }
 
         if (board.size() > 10)
             board.remove(board.size() - 1);
