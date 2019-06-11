@@ -91,19 +91,18 @@ public class Game extends Application {
                     (tmpM == missingM.get() && tmpN == missingN.get() - 1) ||
                     (tmpM == missingM.get() + 1 && tmpN == missingN.get()) ||
                     (tmpM == missingM.get() - 1 && tmpN == missingN.get())) {
-                int tmpI = (tmpN - 1)* m + tmpM;
+                int tmpI = (tmpN - 1) * m + tmpM;
                 Collections.swap(partsMix, missing.get(), tmpI);
                 missing.set(tmpI);
                 root.getChildren().remove(tmp);
                 root.add(tmp, missingM.get(), missingN.get(), 1, 1);
                 missingM.set(tmpM);
                 missingN.set(tmpN);
-                if(partsMix.equals(parts)) {
+                if (partsMix.equals(parts)) {
                     System.out.println("YOU WON!");
                 }
             }
         };
-
 
         for (int i = 0; i < size; ++i) {
             if (i != missing.get())
