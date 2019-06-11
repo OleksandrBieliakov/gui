@@ -1,23 +1,29 @@
 package gui.project2v2;
 
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.event.EventHandler;
-import javafx.geometry.Pos;
+import javafx.geometry.HPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import javax.swing.*;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -37,20 +43,57 @@ public class Game extends Application {
         );
 
         Button btnBT = new Button("BEST TIME");
-        btnBT.setOnAction(e -> System.out.println("Opening best time board"));
+        btnBT.setOnAction(event -> {
+                    primaryStage.setTitle("Records");
+                    primaryStage.setScene(setRecordsScene(primaryStage));
+                    primaryStage.show();
+                }
+        );
 
         Button btnEX = new Button("EXIT");
         btnEX.setOnAction(e -> System.exit(0));
 
-        StackPane root1 = new StackPane();
-
-        StackPane.setAlignment(btnPL, Pos.TOP_CENTER);
-        StackPane.setAlignment(btnBT, Pos.CENTER);
-        StackPane.setAlignment(btnEX, Pos.BOTTOM_CENTER);
+        VBox root1 = new VBox();
 
         root1.getChildren().addAll(btnPL, btnBT, btnEX);
 
         return new Scene(root1, 1024, 768);
+    }
+
+    private static Scene setRecordsScene(Stage primaryStage) {
+
+        GridPane root = new GridPane();
+
+        Button exit = new Button("EXIT TO MENU");
+        exit.setOnAction(event -> {
+                    primaryStage.setTitle("Menu");
+                    primaryStage.setScene(setMenuScene(primaryStage));
+                    primaryStage.show();
+                }
+        );
+
+        root.add(exit, 0, 0);
+        int next = 1;
+        File file = new File("data/pr2_board");
+        boolean newRec = false;
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String s;
+            int record;
+            String name;
+            while ((s = br.readLine()) != null) {
+                name = s;
+                record = Integer.parseInt(br.readLine());
+                root.add(new Label(next + ". " + name), 0, next);
+                int min = (int) (record) / 60000;
+                int sec = (int) ((record - min * 60000) / 1000);
+                root.add(new Label(min + ":" + sec), 1, next++);
+            }
+        } catch (FileNotFoundException ignored) {
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return new Scene(root, 1024, 768);
     }
 
     @SuppressWarnings("Duplicates")
@@ -83,14 +126,48 @@ public class Game extends Application {
         ArrayList<ImageView> partsMix = new ArrayList<>(parts);
 
         Random r = new Random();
-        for (int i = 1, a, b; i > 0; --i) {
-            a = r.nextInt(size);
-            b = r.nextInt(size);
-            while (b == a) {
-                b = r.nextInt(size);
+
+
+        AtomicInteger missingN = new AtomicInteger(r.nextInt(n));
+        AtomicInteger missingM = new AtomicInteger(r.nextInt(m));
+        AtomicInteger missing = new AtomicInteger(m * (missingN.get()) + missingM.get());
+
+        for (int i = 1; i > 0; --i) {
+
+            ArrayList<Integer> arr = new ArrayList<>();
+
+            System.out.println("n " + missingN.get() + " m " + missingM.get() + " mis" + missing.get());
+
+
+            if ((missingN.get() + 1) < n) {
+                arr.add(m * (missingN.get() + 1) + missingM.get());
+                System.out.println("1-" + arr.get(arr.size() - 1));
             }
-            Collections.swap(partsMix, a, b);
+            if ((missingN.get() - 1) >= 0) {
+                arr.add(m * (missingN.get() - 1) + missingM.get());
+                System.out.println("2-" + arr.get(arr.size() - 1));
+            }
+            if ((missingM.get() + 1) < m) {
+                arr.add(m * missingN.get() + missingM.get() + 1);
+                System.out.println("3-" + arr.get(arr.size() - 1));
+            }
+            if ((missingM.get() - 1) >= 0) {
+                arr.add(m * missingN.get() + missingM.get() - 1);
+                System.out.println("4-" + arr.get(arr.size() - 1));
+            }
+
+            int with = r.nextInt(arr.size());
+            Collections.swap(partsMix, missing.get(), arr.get(with));
+
+            missingN.set(arr.get(with) / m);
+            missingM.set(arr.get(with) % m);
+            missing.set(arr.get(with));
+
+            System.out.println("n " + missingN.get() + " m " + missingM.get() + " mis " + missing.get());
+
         }
+
+        missingN.getAndIncrement();
 
         Button exit = new Button("EXIT TO MENU");
         exit.setOnAction(event -> {
@@ -110,10 +187,26 @@ public class Game extends Application {
             }
         }
 
-        AtomicInteger missingN = new AtomicInteger(r.nextInt(n) + 1);
-        AtomicInteger missingM = new AtomicInteger(r.nextInt(m));
-        AtomicInteger missing = new AtomicInteger(m * (missingN.get() - 1) + missingM.get());
         root.getChildren().remove(partsMix.get(missing.get()));
+
+        Label timer = new Label("00:00");
+        GridPane.setHalignment(timer, HPos.CENTER);
+        root.add(timer, n, 0);
+
+
+        long start = System.currentTimeMillis();
+
+        Timeline timeline = new Timeline(new KeyFrame(
+                Duration.millis(1000),
+                ae -> {
+                    long cur = System.currentTimeMillis();
+                    long time = cur - start;
+                    int min = (int) (time) / 60000;
+                    int sec = (int) ((time - min * 60000) / 1000);
+                    timer.setText(min + ":" + sec);
+                }));
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
 
         EventHandler<MouseEvent> handler = e -> {
             ImageView tmp = (ImageView) e.getSource();
@@ -132,7 +225,13 @@ public class Game extends Application {
                 missingM.set(tmpM);
                 missingN.set(tmpN);
                 if (partsMix.equals(parts)) {
-                    System.out.println("YOU WON!");
+                    timeline.stop();
+
+                    Label completed = new Label("COMPLETED!");
+                    GridPane.setHalignment(completed, HPos.CENTER);
+                    root.add(completed, n - 1, 0);
+
+                    checkBoard(System.currentTimeMillis() - start);
                 }
             }
         };
@@ -149,6 +248,56 @@ public class Game extends Application {
     }
 
 
+    private static void checkBoard(long time) {
+        File file = new File("data/pr2_board");
+        ArrayList<GameRecord> board = new ArrayList<>();
+        boolean newRec = false;
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String s;
+            int record;
+            String name;
+            while ((s = br.readLine()) != null) {
+                name = s;
+                record = Integer.parseInt(br.readLine());
+                if (time > record) newRec = true;
+                board.add(new GameRecord(name, record));
+            }
+        } catch (FileNotFoundException ignored) {
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (!newRec && board.size() == 10) return;
+
+        String name = JOptionPane.showInputDialog("NEW RECORD! Enter your name:");
+
+        board.add(new GameRecord(name, (int) time));
+        int count = 1;
+        for (GameRecord gr : board) {
+            System.out.print(count++ + ". " + gr.toString());
+        }
+        System.out.println();
+        board.sort(Comparator.naturalOrder());
+        count = 1;
+        for (GameRecord gr : board) {
+            System.out.print(count++ + ". " + gr.toString());
+        }
+
+        if (board.size() > 10)
+            board.remove(board.size() - 1);
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
+            StringBuilder sb = new StringBuilder();
+            for (GameRecord gr : board) {
+                sb.append(gr.toString());
+            }
+            bw.write(sb.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     @Override
     public void start(Stage primaryStage) {
 
@@ -159,7 +308,6 @@ public class Game extends Application {
         primaryStage.setScene(setMenuScene(primaryStage));
 
         primaryStage.show();
-
 
     }
 }
