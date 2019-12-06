@@ -1,4 +1,4 @@
-package gui.project1;
+package pointed.project1;
 
 import javax.swing.*;
 import java.awt.*;

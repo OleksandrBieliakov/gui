@@ -1,4 +1,4 @@
-package gui.project2;
+package pointed.project2;
 
 class GameRecord implements Comparable<GameRecord>{
     private String name;

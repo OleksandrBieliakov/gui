@@ -1,4 +1,4 @@
-package gui.project2;
+package pointed.project2;
 
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
